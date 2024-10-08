@@ -1,2 +1,2 @@
-# SQL-TUTORIAl
+# SQL-TUTORIAL
 Teoria de SQL
