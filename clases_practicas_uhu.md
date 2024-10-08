@@ -27,5 +27,17 @@ VALUES('A00000001', 'Kietostar', 'http://www.kietostar.com');
 
 INSERT INTO COMPAÑIA
 VALUES('B00000002','Aotra','http://www.aotra.com');
-  
+
+INSERT INTO TARIFA
+VALUES('familiar','A00000001','la pareja también está en la compañía',0.15);
+
+INSERT INTO TARIFA
+VALUES('autónomos','B00000002','trabajador autónomo',0.12);
+
+INSERT INTO TARIFA
+VALUES('dúo','B00000002','la pareja también está en la compañía',0.15);
+
+INSERT INTO COMPAÑIA
+VALUES('A00000001','Petafón','http://www.petafón.com '); --No funciona porque se incumple   que el ID ya existe
+
 ``` 
