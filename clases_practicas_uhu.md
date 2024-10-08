@@ -1,5 +1,5 @@
 # Codigo clases practicas de la universidad
-'''sql
+```sql
   CREATE TABLE llamada(
     tf_origen char(9),
     tf_destino char(9),
@@ -24,4 +24,4 @@ VALUES('A00000001', 'Kietostar', 'http://www.kietostar.com');
 INSERT INTO COMPAÑIA
 VALUES('B00000002','Aotra','http://www.aotra.com');
   
-'''
+``` 
