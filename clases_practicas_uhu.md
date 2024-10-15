@@ -53,4 +53,47 @@ where nombre like  'R%M%'
 select *
 from mf.cliente
 where nombre like  '% M%'
+
+select *
+from mf.cliente
+where nombre  like  'R% M% S%'
+
+select *
+from mf.cliente
+order by f_nac
+
+select nombre, direccion --2
+from mf.cliente
+where extract(year from f_nac) IN ('1973','1985') and cp like '15%' 
+order by nombre asc, direccion desc
+
+select tf_destino --3
+from mf.llamada
+where tf_origen = '666010101' and extract(year from fecha_hora) = '2006'
+
+select tf_origen --4
+from mf.llamada
+where tf_destino = '666010101' and extract(hour from fecha_hora) between 10 and 12
+
+select tarifa --5
+from mf.telefono
+where cliente like '%2%'  and tipo like 'C' and puntos between 10000 and 20000
+
+select numero, tarifa --6
+from mf.telefono
+where extract(month from f_contrato) = '05' and tarifa not like 'joven'
+and numero like '%9'
+order by puntos desc
+
+select tf_destino --7
+from mf.llamada
+where tf_origen = '654345345' and extract(month from fecha_hora) between '10' and '11'
+and duracion > 250
+
+select nombre --8
+from mf.cliente
+where extract(year from f_nac) between '1970' and '1985'
+and provincia = 'Huelva'
+order by ciudad asc, provincia desc
+
 ``` 
