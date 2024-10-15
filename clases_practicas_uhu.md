@@ -40,4 +40,17 @@ VALUES('dúo','B00000002','la pareja también está en la compañía',0.15);
 INSERT INTO COMPAÑIA
 VALUES('A00000001','Petafón','http://www.petafón.com '); --No funciona porque se incumple   que el ID ya existe
 
+-- CONSULTAS DE TABLAS
+select * from mf.cliente
+
+select nombre, ciudad from mf.cliente
+WHERE DNI = '35000001P'
+
+select *
+from mf.cliente
+where nombre like  'R%M%'
+
+select *
+from mf.cliente
+where nombre like  '% M%'
 ``` 
