@@ -96,4 +96,26 @@ where extract(year from f_nac) between '1970' and '1985'
 and provincia = 'Huelva'
 order by ciudad asc, provincia desc
 
+
+-- practica 4 Join
+
+
+select *
+from mf.telefono tlf inner join mf.cliente cli ON(tlf.cliente = cli.dni)
+
+
+-- S2.1 Mostrar el código y coste de las tarifas junto con el nombre de la compañía que las ofrecen, de aquellas
+-- tarifas cuya descripción indique que otras personas deben estar también en la misma compañía
+select tar.coste, tar.tarifa, com.nombre
+from mf.tarifa tar inner join mf.compañia com ON(tar.compañia = com.cif)
+where tar.descripcion like '%en la compañía'
+
+
+
+select tlf.numero, cli.nombre
+from mf.telefono tlf inner join mf.tarifa tar using(tarifa, compañia)
+inner join mf.cliente cli ON(tlf.cliente = cli.dni)
+where tar.coste < 0.2
+
+-- S2.2 Nombre y número de teléfonos de aquellos abonados con contrato que tienen tarifas inferiores a 0,20 €.
 ``` 
