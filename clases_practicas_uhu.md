@@ -116,4 +116,12 @@ select tlf.numero, cli.nombre
 from mf.telefono tlf inner join mf.tarifa tar using(tarifa, compañia)
 inner join mf.cliente cli ON(tlf.cliente = cli.dni)
 where tar.coste < 0.2 and tlf.tipo = 'C'
+
+
+
+-- S2.3 Obtener el código de las tarifas, el nombre de las compañías, los números de teléfono y los puntos, de
+-- aquellos teléfonos que se contrataron en el año 2006 y que hayan obtenido más de 200 puntos
+select tlf.tarifa, com.nombre, tlf.puntos, tlf.numero
+from mf.telefono tlf inner join mf.compañia com ON(tlf.compañia = com.cif)
+where extract(year from f_contrato) = '2006' and tlf.puntos > 200
 ``` 
