@@ -115,6 +115,5 @@ where tar.descripcion like '%en la compañía'
 select tlf.numero, cli.nombre
 from mf.telefono tlf inner join mf.tarifa tar using(tarifa, compañia)
 inner join mf.cliente cli ON(tlf.cliente = cli.dni)
-where tar.coste < 0.2
-
+where tar.coste < 0.2 and tlf.tipo = 'C'
 ``` 
