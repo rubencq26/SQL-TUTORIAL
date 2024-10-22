@@ -111,11 +111,10 @@ from mf.tarifa tar inner join mf.compañia com ON(tar.compañia = com.cif)
 where tar.descripcion like '%en la compañía'
 
 
-
+-- S2.2 Nombre y número de teléfonos de aquellos abonados con contrato que tienen tarifas inferiores a 0,20 €.
 select tlf.numero, cli.nombre
 from mf.telefono tlf inner join mf.tarifa tar using(tarifa, compañia)
 inner join mf.cliente cli ON(tlf.cliente = cli.dni)
 where tar.coste < 0.2
 
--- S2.2 Nombre y número de teléfonos de aquellos abonados con contrato que tienen tarifas inferiores a 0,20 €.
 ``` 
