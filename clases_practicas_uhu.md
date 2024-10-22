@@ -131,4 +131,16 @@ where extract(year from f_contrato) = '2006' and tlf.puntos > 200
 select cal.tf_origen, cal.tf_destino, tlf.tipo
 from mf.llamada cal inner join mf.telefono tlf ON(cal.tf_origen = tlf.numero)
 where extract(hour from fecha_hora) BETWEEN '8' and '9'
+
+
+
+-- S2.5 Interesa conocer los nombres y números de teléfono de los clientes (origen y destino) que, perteneciendo
+-- a compañías distintas, mantuvieron llamadas que superaron los 15 minutos. Se desea conocer, también, la
+-- fecha y la hora de dichas llamadas así como la duración de esas llamadas
+select cli_or.nombre,cal.tf_origen,cli_des.nombre, cal.tf_destino, cal.fecha_hora, cal.duracion
+from mf.llamada cal inner join mf.telefono tlf on(cal.tf_origen = tlf.numero)
+                    inner join mf.telefono tf_des on(cal.tf_destino = tf_des.numero)
+                    inner join mf.cliente cli_or on(tlf.cliente = cli_or.dni)
+                    inner join mf.cliente cli_des on(tf_des.cliente = cli_des.dni)
+    where tlf.compañia <> tf_des.compañia and cal.duracion > 15
 ``` 
