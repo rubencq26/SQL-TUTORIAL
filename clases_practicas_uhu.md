@@ -124,4 +124,11 @@ where tar.coste < 0.2 and tlf.tipo = 'C'
 select tlf.tarifa, com.nombre, tlf.puntos, tlf.numero
 from mf.telefono tlf inner join mf.compañia com ON(tlf.compañia = com.cif)
 where extract(year from f_contrato) = '2006' and tlf.puntos > 200
+
+
+-- S2.4 Obtener los números de teléfono (origen y destino), así como el tipo de contrato, de los clientes que alguna
+-- vez hablaron por teléfono entre las 8 y las 10 de la mañana
+select cal.tf_origen, cal.tf_destino, tlf.tipo
+from mf.llamada cal inner join mf.telefono tlf ON(cal.tf_origen = tlf.numero)
+where extract(hour from fecha_hora) BETWEEN '8' and '9'
 ``` 
