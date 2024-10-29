@@ -143,4 +143,33 @@ from mf.llamada cal inner join mf.telefono tlf on(cal.tf_origen = tlf.numero)
                     inner join mf.cliente cli_or on(tlf.cliente = cli_or.dni)
                     inner join mf.cliente cli_des on(tf_des.cliente = cli_des.dni)
     where tlf.compañia <> tf_des.compañia and cal.duracion > 15
+
+
+
+-- Practica 5 consultas anidadas
+
+select *
+from mf.telefono tlf
+where tlf.compañia IN (select cif from mf.compañia where nombre ='Kietostar' or nombre = 'Petafón')
+
+-- S3.1 Obtener la fecha (día-mes-año) en la que se realizó la llamada de mayor duración
+select to_char(ll.fecha_hora, 'dd-mm-yyyy') as fecha
+from mf.llamada ll
+where ll.duracion >= ALL(select l2.duracion
+                        from mf.llamada l2)
+
+
+-- S3.2 Obtener el nombre de los abonados de la compañía ‘Aotra’ con el mismo tipo de tarifa que la del telefono “654123321”
+select cli.nombre from mf.cliente cli inner join mf.telefono tlf ON(tlf.cliente = cli.dni)
+where tlf.compañia In(select cif from mf.compañia where nombre = 'Aotra')
+and tlf.tarifa = (select tarifa from mf.telefono where numero = '654123321')
+
+-- S3.3 Mostrar, utilizando para ello una subcobsulta, el número de teléfono, fecha de contrato y tipo de los
+-- abonados que han llamado a teléfonos de clientes de fuera de la provincia de La Coruña durante el mes de
+-- octubre de 2006
+select distinct tlf2.numero, tlf2.f_contrato, tlf2.tipo
+from mf.llamada ll inner join mf.telefono tlf2 ON(ll.tf_origen = tlf2.numero)
+where ll.tf_destino IN(select tlf.numero from mf.cliente cli inner join mf.telefono tlf ON(tlf.cliente = cli.dni) where cli.provincia <> 'La Coruña') 
+and to_char(ll.fecha_hora, 'MM/YYYY' )= '10/2006'
+
 ``` 
