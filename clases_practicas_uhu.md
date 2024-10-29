@@ -172,4 +172,20 @@ from mf.llamada ll inner join mf.telefono tlf2 ON(ll.tf_origen = tlf2.numero)
 where ll.tf_destino IN(select tlf.numero from mf.cliente cli inner join mf.telefono tlf ON(tlf.cliente = cli.dni) where cli.provincia <> 'La Coruña') 
 and to_char(ll.fecha_hora, 'MM/YYYY' )= '10/2006'
 
+
+--S3.4 Se necesita conocer el nombre de los clientes que tienen teléfonos con tarifa “dúo” pero no “autónomos”.
+-- Utiliza subconsultas para obtener la solución.
+select nombre
+from mf.cliente
+where dni IN(
+    select tlf.cliente
+    from mf.telefono tlf
+    where tlf.tarifa = 'dúo'
+)
+and dni not IN(
+select tlf.cliente
+from mf.telefono tlf
+where tlf.tarifa = 'autónomos'
+)
+
 ``` 
