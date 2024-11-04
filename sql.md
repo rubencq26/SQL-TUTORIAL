@@ -158,3 +158,14 @@ FROM table_name
 WHERE NOT condition;
 ```
 
+#### Operador NOT LIKE
+
+Extrae todos las tuplas que no contengan ese patron
+
+```sql
+SELECT * FROM Customers
+WHERE CustomerName NOT LIKE 'A%';
+```
+
+
+
