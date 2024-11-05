@@ -224,5 +224,14 @@ and not exists(select *
 from mf.llamada ll where tf.numero = ll.tf_origen and  tf_destino = 666789789)
 
 
+-- S4.5 Utilizando consultas correlacionadas, obtener el nombre y número de teléfono de los clientes de la compañía Kietostar que no han hecho llamadas a otros teléfonos de la misma compañía
+select cl.nombre, tf.numero
+from mf.cliente cl inner join mf.telefono tf ON(cl.dni = tf.cliente)
+where exists(select *
+from mf.compañia cm
+where tf.compañia = cm.cif and cm.nombre = 'Kietostar')
+and not exists(select *
+from mf.llamada ll inner join mf.telefono tfd On(ll.tf_destino = tfd.numero)
+where ll.tf_origen = tf.numero and tf.compañia = tfd.compañia)
 
 ``` 
