@@ -188,4 +188,41 @@ from mf.telefono tlf
 where tlf.tarifa = 'autónomos'
 )
 
+
+-- S4.1 Utilizando consultas correlacionadas, mostrar el nombre de los abonados que han llamado el día ‘16/10/06’
+select nombre
+from mf.cliente cl inner join mf.telefono tf on(cl.dni = tf.cliente)
+where exists(select *
+from mf.llamada ll where to_char(ll.fecha_hora, 'dd-mm-yy') = '16-10-06' and ll.tf_origen = tf.numero)
+
+
+-- S4.2 Utilizando consultas correlacionadas, obtener el nombre de los abonados que han realizado llamadas de menos de 1 minuto y medio
+select nombre
+from mf.cliente cl inner join mf.telefono tf on(cl.dni = tf.cliente)
+where exists(select *
+from mf.llamada ll
+where tf.numero = ll.tf_origen and ll.duracion < 90)
+
+
+
+-- S4.3 Utilizando consultas correlacionadas, obtener el nombre de los abonados de la compañía ‘KietoStar’ que no hicieron ninguna llamada el mes de septiembre
+select nombre
+from mf.cliente cl inner join mf.telefono tf ON(cl.dni = tf.cliente)
+where tf.compañia = (select cif
+from mf.compañia where nombre = 'Kietostar')
+and not exists(select * from mf.llamada ll
+where ll.tf_origen = tf.numero and extract(month from ll.fecha_hora) = '09')
+
+
+-- S4.4 Utilizando consultas correlacionadas, mostrar todos los datos de los telefonos que hayan llamado al número 654234234 pero no al 666789789
+select *
+from mf.telefono tf 
+where exists(select *
+from mf.llamada ll
+where tf.numero = ll.tf_origen and ll.tf_destino = 654234234) 
+and not exists(select *
+from mf.llamada ll where tf.numero = ll.tf_origen and  tf_destino = 666789789)
+
+
+
 ``` 
