@@ -234,4 +234,23 @@ and not exists(select *
 from mf.llamada ll inner join mf.telefono tfd On(ll.tf_destino = tfd.numero)
 where ll.tf_origen = tf.numero and tf.compañia = tfd.compañia)
 
-``` 
+
+-- Sesion 5
+-- Ejercicio 1
+select comp.nombre
+from mf.llamada ll inner join mf.telefono tf on(ll.tf_origen = tf.numero)
+inner join mf.compañia comp on(tf.compañia = comp.cif)
+where to_char(ll.fecha_hora,'dd/mm/yy') = '16/10/06'
+group by comp.nombre
+having count(*) = (select MAX(count(*))
+                    from mf.llamada llam inner join mf.telefono tlf on llam.tf_origen = tlf.numero
+                    where to_char(llam.fecha_hora,'dd/mm/yy') = '16/10/06'
+                    group by tlf.compañia)
+
+
+
+
+
+```
+
+[Pastebin](https://pastebin.com/Y9N31KWv)
