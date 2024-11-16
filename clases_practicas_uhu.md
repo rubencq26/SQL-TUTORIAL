@@ -254,3 +254,5 @@ having count(*) = (select MAX(count(*))
 ```
 
 [Pastebin](https://pastebin.com/Y9N31KWv)
+
+[Ejercicios](https://github.com/JuanmaFranco/Ejercicios-SQL/blob/main/ejercicios/empleados.MD)
