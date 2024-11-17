@@ -248,7 +248,8 @@ having count(*) = (select MAX(count(*))
                     group by tlf.compañia)
 
 
--- Obtener los nombres distintos de los clientes que residen en la provincia de "Granada" y que realizaron llamadas desde un teléfono asociado a la compañía "Kietostar" hacia un teléfono de la compañía "Aotra".
+-- Obtener los nombres distintos de los clientes que residen en la provincia de "Granada"
+-- y que realizaron llamadas desde un teléfono asociado a la compañía "Kietostar" hacia un teléfono de la compañía "Aotra".
 Select distinct cli.nombre
 from mf.cliente cli 
 inner join mf.telefono tfor on(cli.dni = tfor.cliente) 
