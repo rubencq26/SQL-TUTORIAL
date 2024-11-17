@@ -348,10 +348,10 @@ group by cl.nombre
 having sum(ll.duracion/60*ta.coste) < 100;
 
 
--*Listar los nombres de clientes, sus números de teléfono, y la compañía asociada a dichos teléfonos, siempre y cuando cumplan con las siguientes condiciones:
+/*Listar los nombres de clientes, sus números de teléfono, y la compañía asociada a dichos teléfonos, siempre y cuando cumplan con las siguientes condiciones:
 
 El cliente utiliza una tarifa denominada "dúo".
-El cliente no ha realizado llamadas en el mes de octubre de 2006 hacia teléfonos que pertenezcan a la compañía "Petafón".*-
+El cliente no ha realizado llamadas en el mes de octubre de 2006 hacia teléfonos que pertenezcan a la compañía "Petafón".*/
 
 select cli.nombre, tel_o.numero, cia_o.nombre as compañia
 from mf.cliente cli 
