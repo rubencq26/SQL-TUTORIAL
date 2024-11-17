@@ -347,6 +347,27 @@ where ll.tf_destino in (select t.numero
 group by cl.nombre
 having sum(ll.duracion/60*ta.coste) < 100;
 
+
+-*Listar los nombres de clientes, sus números de teléfono, y la compañía asociada a dichos teléfonos, siempre y cuando cumplan con las siguientes condiciones:
+
+El cliente utiliza una tarifa denominada "dúo".
+El cliente no ha realizado llamadas en el mes de octubre de 2006 hacia teléfonos que pertenezcan a la compañía "Petafón".*-
+
+select cli.nombre, tel_o.numero, cia_o.nombre as compañia
+from mf.cliente cli 
+                inner join mf.telefono tel_o on (cli.dni=tel_o.cliente)
+                inner join mf.compañia cia_o on (tel_o.compañia=cia_o.cif)
+where exists (select * from mf.tarifa tar
+                where tar.tarifa='dúo'
+                and cia_o.cif=tar.compañia)
+ and not exists (select * from mf.llamada ll 
+                inner join mf.telefono tel_d on (ll.tf_destino=tel_d.numero)
+                inner join mf.compañia cia_d on (tel_d.compañia=cia_d.cif)
+                 where to_char(ll.fecha_hora, 'mm/yy')='10/06'
+                 and cia_d.nombre='Petafón'
+                 and tel_o.numero=ll.tf_origen);
+
+
 ```
 
 [Pastebin](https://pastebin.com/Y9N31KWv)
