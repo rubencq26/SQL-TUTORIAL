@@ -262,6 +262,90 @@ and cmor.nombre = 'Kietostar'
 and cmdes.nombre = 'Aotra'
 
 
+--PRACTICA 2 SESION 5
+ 
+--Consulta 1
+/*1*/       SELECT distinct co.nombre, count(*) num_llamadas
+            FROM MF.llamada ll 
+                inner join MF.telefono t on ll.tf_origen=t.numero
+                inner join MF.compañia co on t.compañia=co.cif
+            WHERE to_char(fecha_hora, 'dd/mm/yy') = '16/10/06' --Compañias que han hecho llamadas ese día
+            GROUP BY co.nombre
+ /*2*/      HAVING COUNT(*) =  (SELECT MAX(COUNT(*))
+                                FROM MF.llamada ll inner join MF.telefono t on tf_origen=t.numero
+                                WHERE to_char(fecha_hora, 'dd/mm/yy') = '16/10/06'
+                                GROUP BY t.compañia); --En el having, filtramos para que devuelva la agrupacion 
+                                                      --cuyo count se iguala al max valor de counts 
+                                                      
+--consulta 2
+SELECT T.numero, C.nombre
+FROM MF.CLIENTE C 
+    INNER JOIN MF.TELEFONO T ON C.dni=T.cliente
+WHERE NOT EXISTS (SELECT * -- Seleccionar los teléfonos que recibieron llamadas del 654345345 en octubre de 2006
+                    FROM MF.LLAMADA L1
+                    WHERE L1.tf_origen= '654345345' AND
+                    to_char(L1.fecha_hora, 'mm/yy') = '10/06'
+                    AND NOT EXISTS (SELECT * --Seleccionar todas las llamadas realizadas desde los teléfonos considerados y establecer la correlación entre subconsultas
+                                    FROM MF.LLAMADA L2
+                                    WHERE T.numero = L2.tf_origen AND L2.tf_destino = L1.tf_destino
+                                    AND L2.tf_origen<> '654345345'));
+                                    
+--consulta 3
+select cl.nombre as cliente ,c.nombre as compañia, sum(ll.duracion/60*ta.coste) as COSTE --multiplicamos porque el la duracion es en segundos, y el coste en minutos
+from MF.cliente cl 
+    inner join MF.telefono t on t.cliente=cl.dni
+    inner join MF.tarifa ta on ta.tarifa=t.tarifa and ta.compañia=t.compañia
+    inner join MF.compañia c on c.cif=ta.compañia
+    inner join MF.llamada ll on ll.tf_origen=t.numero
+group by cl.nombre,c.nombre
+order by cliente DESC, compañia ASC;
+ 
+ 
+ 
+ 
+ 
+--consulta 4
+select cl.nombre as CLIENTE, sum (ll.duracion) AS DURACION
+from MF.llamada ll 
+    inner join MF.telefono t on ll.tf_origen=t.numero
+    inner join MF.cliente cl on t.cliente=cl.dni
+where ll.tf_origen in (select te.numero --llamadas realizadas por clientes de coruña
+                    from MF.telefono te inner join MF.cliente ci on te.cliente=ci.dni
+                    where ci.provincia='La Coruña')
+AND ll.tf_destino IN (SELECT TEL.numero
+                        from  mf.telefono tel inner join mf.cliente clte on tel.cliente = clte.dni 
+                        where clte.provincia = 'Jaén')
+group by cl.nombre;
+ 
+--consulta 5
+select ci.nombre, count(*) as numLlamadas
+from MF.llamada ll 
+    inner join MF.telefono t on ll.tf_origen=t.numero
+    inner join MF.cliente ci on ci.dni=t.cliente
+    group by ci.nombre
+    having count(*) > 5;
+ 
+--consulta 6
+select cl.nombre as cliente ,avg(ta.coste) as media
+from MF.cliente cl 
+    inner join MF.telefono t on t.cliente=cl.dni
+    inner join MF.tarifa ta using(tarifa, compañia)
+group by cl.nombre
+having avg(ta.coste)>= ALL (select avg(coste)
+                            from MF.tarifa);
+                            
+--consulta 7
+ 
+select cl.nombre as cliente, sum(ll.duracion/60*ta.coste) as costeLlamadas
+from MF.llamada ll 
+    inner join MF.telefono t on ll.tf_origen=t.numero
+    inner join MF.tarifa ta using(tarifa, compañia)
+    inner join MF.cliente cl on t.cliente=cl.dni
+where ll.tf_destino in (select t.numero
+                        from MF.telefono t inner join MF.compañia c on t.compañia=c.cif
+                        where c.nombre='Kietostar')
+group by cl.nombre
+having sum(ll.duracion/60*ta.coste) < 100;
 
 ```
 
