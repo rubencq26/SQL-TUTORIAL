@@ -248,6 +248,17 @@ having count(*) = (select MAX(count(*))
                     group by tlf.compañia)
 
 
+-- Obtener los nombres distintos de los clientes que residen en la provincia de "Granada" y que realizaron llamadas desde un teléfono asociado a la compañía "Kietostar" hacia un teléfono de la compañía "Aotra".
+Select distinct cli.nombre
+from mf.cliente cli 
+inner join mf.telefono tfor on(cli.dni = tfor.cliente) 
+inner join mf.llamada ll on(tfor.numero = ll.tf_origen)
+inner join mf.compañia cmor on(cmor.cif = tfor.compañia)
+inner join mf.telefono tfdes on(ll.tf_destino = tfdes.numero)
+inner join mf.compañia cmdes on(cmdes.cif = tfdes.compañia)
+where cli.provincia = 'Granada' 
+and cmor.nombre = 'Kietostar'
+and cmdes.nombre = 'Aotra'
 
 
 
