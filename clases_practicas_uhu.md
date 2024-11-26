@@ -368,8 +368,83 @@ where exists (select * from mf.tarifa tar
                  and tel_o.numero=ll.tf_origen);
 
 
+-- Sesion 1 PL SQL
+-- script hola nombre
+set serveroutput on;
+
+create or replace
+procedure hola (nombre varchar) is
+begin
+    dbms_output.put_line('Hola ' || nombre);
+    end;
+-- llamar funcion
+call hola('Ruben')
+
+
+-- eje 1
+create or replace
+function facturacion(origen LLAMADA.tf_origen%TYPE, p_año INTEGER)
+return float is
+Importe_total number(10,2);
+facturacionBaja EXCEPTION;
+begin
+    select TRUNC(SuM((ll.duracion * tar.coste)/60),2) INTO Importe_total
+    from(telefono t inner join tarifa tar using(tarifa,compañia))
+    inner join llamada ll on ll.tf_origen = t.numero
+    where extract(year from ll.fecha_hora) = p_año
+        and ll.tf_origen = origen
+        group by ll.tf_origen;
+        if(Importe_total < 1)then
+            raise facturacionBaja;
+            end if;
+            return Importe_total;
+
+exception
+    when facturacionBaja then
+        dbms_output.put_line('Facturacion demasiado baja!!');
+        Return -1;
+    when NO_DATA_FOUND then
+        dbms_output.put_line('El telefono introducido no existe');
+        return -1;
+    when OTHERS then
+        dbms_output.put_line('Ha ocurrido un error');
+        return -1;
+end facturacion;
+
+
+call dbms_output.put_line( facturacion('654123321',2006));
+
+
+create or replace
+procedure LlamadaFacturacion(p_año INTEGER) is
+cursor c_telefonos is
+select distinct tf_origen from llamada
+where extract(year from fecha_hora) = p_año; 
+
+begin
+
+dbms_output.put_line('Nº teléfono' || ' ' ||'Importe (en €)');
+dbms_output.put_line('----------- -----------------');
+for r_telefono IN c_telefonos LOOP
+dbms_output.put_line(r_telefono.tf_origen || ' ' || facturacion(r_telefono.tf_origen, p_año));
+end loop;
+
+
+exception
+when others  then
+dbms_output.put_line('Ha ocurrido un error!!'); 
+
+end;
+
+call LlamadaFacturacion(2006);
+
+
 ```
 
+
 [Pastebin](https://pastebin.com/Y9N31KWv)
+[Pastebin 2](https://pastebin.com/Zwp1KGKX)
+
+contraseña: lentejasconchorizo
 
 [Ejercicios](https://github.com/JuanmaFranco/Ejercicios-SQL/blob/main/ejercicios/empleados.MD)
