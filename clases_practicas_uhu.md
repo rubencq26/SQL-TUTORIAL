@@ -448,7 +448,7 @@ call LlamadaFacturacion(2006);
 
 contraseña: lentejasconchorizo
 
-[Pastebin 3] (https://pastebin.com/7cp3fs9s)
+[Pastebin 3](https://pastebin.com/7cp3fs9s)
 
 contraseña: peñalacanoa
 
