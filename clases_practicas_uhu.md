@@ -439,6 +439,60 @@ end;
 call LlamadaFacturacion(2006);
 
 
+
+
+--Sesion 6
+create or replace
+procedure ej3(nom compañia.nombre%type, fecha date) is
+noLlamada exception;
+nLlamadas integer;
+nLLaDur integer;
+cursor c_telef is
+select tf.numero from telefono tf inner join compañia c on c.cif = tf.compañia
+where c.nombre = nom;
+
+cursor c_llam (tlf llamada.tf_origen%type) is
+select tf_origen, tf_destino, duracion
+from llamada
+where to_char(fecha_hora, 'dd/mm/yy') = fecha and tf_origen = tlf;
+
+begin
+ select count(*) into nLlamadas
+ from llamada ll inner join telefono tf on ll.tf_origen = tf.numero
+ inner join compañia cia on cia.cif = tf.compañia
+ where to_char(ll.fecha_hora,'dd/mm.yy') = fecha
+ and cia.nombre = nom;
+ 
+ if(nLlamadas = 0) then
+    raise noLlamada;
+    end if;
+
+dbms_output.put_line('-----------------------------------');
+dbms_output.put_line('Tlf. Origen  Num_LL   Num_100  %');
+dbms_output.put_line('-----------------------------------');
+for r_telef in c_telef LOOP
+numLlam:=0; numLlamDur:=0;
+for v_llam in c_llam(r_telef.numero) LOOP
+    num
+
+select count(*) into nLLaDur
+from c_llam(r_telef.numero)
+where duracion>100;
+end loop;
+dbms_output.put_line(r_telef.numero || '  ' || nLlamadas || '   ' || nLlaDur || '  ' || (nLlaDur/nLlamadas)*100);
+
+end loop;
+
+exception
+when noLlamada then
+    dbms_output.put_line('No hay llamadas en la fecha ' || fecha || ' en la BD');
+
+when others then
+    dbms_output.put_line('Error');
+end ej3;
+
+
+
 ```
 
 
