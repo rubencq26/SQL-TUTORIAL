@@ -442,55 +442,102 @@ call LlamadaFacturacion(2006);
 
 
 --Sesion 6
-create or replace
-procedure ej3(nom compañia.nombre%type, fecha date) is
-noLlamada exception;
-nLlamadas integer;
-nLLaDur integer;
-cursor c_telef is
-select tf.numero from telefono tf inner join compañia c on c.cif = tf.compañia
-where c.nombre = nom;
-
-cursor c_llam (tlf llamada.tf_origen%type) is
-select tf_origen, tf_destino, duracion
-from llamada
-where to_char(fecha_hora, 'dd/mm/yy') = fecha and tf_origen = tlf;
-
-begin
- select count(*) into nLlamadas
- from llamada ll inner join telefono tf on ll.tf_origen = tf.numero
- inner join compañia cia on cia.cif = tf.compañia
- where to_char(ll.fecha_hora,'dd/mm.yy') = fecha
- and cia.nombre = nom;
+CREATE OR REPLACE PROCEDURE llamadas_cia(
+    cia MF.COMPAÑIA.nombre%TYPE, -- Nombre de la compañía cuyo análisis de llamadas se va a realizar.
+    fecha DATE                   -- Fecha específica en la que se evaluarán las llamadas.
+) IS
  
- if(nLlamadas = 0) then
-    raise noLlamada;
-    end if;
-
-dbms_output.put_line('-----------------------------------');
-dbms_output.put_line('Tlf. Origen  Num_LL   Num_100  %');
-dbms_output.put_line('-----------------------------------');
-for r_telef in c_telef LOOP
-numLlam:=0; numLlamDur:=0;
-for v_llam in c_llam(r_telef.numero) LOOP
-    num
-
-select count(*) into nLLaDur
-from c_llam(r_telef.numero)
-where duracion>100;
-end loop;
-dbms_output.put_line(r_telef.numero || '  ' || nLlamadas || '   ' || nLlaDur || '  ' || (nLlaDur/nLlamadas)*100);
-
-end loop;
-
-exception
-when noLlamada then
-    dbms_output.put_line('No hay llamadas en la fecha ' || fecha || ' en la BD');
-
-when others then
-    dbms_output.put_line('Error');
-end ej3;
-
+ /* Declaraciones locales */
+ num_LL_Total  INTEGER;             -- Número total de llamadas realizadas por un teléfono.
+ num_LL_100    INTEGER;             -- Número de llamadas de más de 100 segundos realizadas por un teléfono.
+ num_Total_Cia INTEGER;             -- Número total de llamadas realizadas por toda la compañía.
+ porcentaje    NUMBER(5,2);         -- Porcentaje de llamadas de más de 100 segundos respecto al total.
+ filas_llamadas_fecha INTEGER;      -- Cantidad de llamadas registradas para la compañía en la fecha dada.
+ no_existe_llamadas_fecha EXCEPTION;-- Excepción personalizada para manejar la ausencia de llamadas.
+ 
+ /* Cursor para obtener los teléfonos asociados a la compañía proporcionada */
+ CURSOR c_telefonos_cia IS 
+  SELECT numero 
+  FROM MF.COMPAÑIA C 
+       INNER JOIN MF.TELEFONO TEL ON C.cif = TEL.compañia
+  WHERE C.nombre = cia;
+ 
+ /* Cursor para obtener las llamadas asociadas a un teléfono específico en la fecha proporcionada */
+ CURSOR c_llamadas_tf(tlf MF.LLAMADA.tf_origen%TYPE) IS
+   SELECT tf_origen, tf_destino, duracion
+   FROM MF.LLAMADA LLAM
+   WHERE TO_CHAR(LLAM.fecha_hora, 'dd/mm/yy') = fecha 
+     AND LLAM.tf_origen = tlf; 
+ 
+BEGIN
+ /* Verificar si existen llamadas asociadas a la compañía en la fecha dada */
+  SELECT COUNT(*) INTO filas_llamadas_fecha 
+  FROM (LLAMADA LLAM INNER JOIN TELEFONO TEL ON LLAM.tf_origen = TEL.numero) 
+       INNER JOIN COMPAÑIA CIA ON CIA.cif = TEL.compañia
+  WHERE TO_CHAR(LLAM.fecha_hora, 'dd/mm/yy') = fecha
+    AND CIA.nombre = cia; 
+ 
+  -- Si no hay llamadas en la fecha indicada, se lanza la excepción personalizada.
+  IF filas_llamadas_fecha = 0 THEN 
+      RAISE no_existe_llamadas_fecha; 
+  END IF;
+ 
+  -- Imprimir encabezado del informe
+  DBMS_OUTPUT.put_line('Tlf. Origen   NUM_LL    NUM_LL_100   PORCENT%');
+  DBMS_OUTPUT.put_line('------------------------------------------------------');
+ 
+  -- Inicializar el contador total de llamadas de la compañía
+  num_Total_Cia := 0;
+ 
+  -- Iterar por cada teléfono asociado a la compañía
+  FOR v_telefono IN c_telefonos_cia LOOP
+    num_LL_Total := 0; -- Inicializar el contador de llamadas por teléfono.
+    num_LL_100 := 0;   -- Inicializar el contador de llamadas de más de 100 segundos.
+ 
+    -- Iterar por cada llamada asociada al teléfono en la fecha indicada.
+    FOR v_llamada IN c_llamadas_tf(v_telefono.numero) LOOP
+       -- Contabilizar llamadas de más de 100 segundos.
+       IF (v_llamada.duracion > 100) THEN
+           num_LL_100 := num_LL_100 + 1;
+       END IF;
+ 
+       -- Contabilizar llamadas totales.
+       num_LL_Total  := num_LL_Total + 1;
+ 
+       -- Incrementar el contador total de llamadas de la compañía.
+       num_Total_Cia := num_Total_Cia + 1;
+    END LOOP;
+ 
+    -- Calcular el porcentaje de llamadas largas.
+    IF (num_LL_100 <> 0) THEN 
+        porcentaje := (num_LL_100 / num_LL_Total) * 100;
+    ELSE 
+        porcentaje := 0;
+    END IF;
+ 
+    -- Imprimir los resultados para cada teléfono.
+    DBMS_OUTPUT.put_line(
+        RPAD(v_telefono.numero, 14) || 
+        RPAD(num_LL_Total, 10) || 
+        RPAD(num_LL_100, 14) || 
+        RPAD(porcentaje || '%', 7)
+    );
+  END LOOP;
+ 
+  -- Imprimir resumen final del informe.
+  DBMS_OUTPUT.put_line('------------------------------------------------------');
+  DBMS_OUTPUT.put_line('Numero Total de LLamadas:' || num_Total_Cia );
+ 
+ /* Bloque de Tratamiento de Excepciones */
+  EXCEPTION
+   -- Manejar la excepción personalizada: no hay llamadas en la fecha indicada.
+   WHEN no_existe_llamadas_fecha THEN
+        DBMS_OUTPUT.put_line('No hay llamadas del ' || fecha || ' en la BD!!:O');
+   -- Manejar cualquier otro error que pueda ocurrir.
+   WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line('Ha ocurrido un error!!:(');
+END llamadas_cia;
+ 
 
 
 ```
