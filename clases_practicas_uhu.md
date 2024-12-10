@@ -537,6 +537,59 @@ BEGIN
    WHEN OTHERS THEN
         DBMS_OUTPUT.put_line('Ha ocurrido un error!!:(');
 END llamadas_cia;
+
+-- Ultima Sesion
+set serveroutput on;
+create or replace procedure eje1(com mf.compañia.nombre%TYPE) IS
+
+cursor ta_compañia is
+    select ta.tarifa, ta.descripcion,ta.coste
+    from mf.tarifa ta inner join mf.compañia c on ta.compañia = c.cif
+    where c.nombre = com;
+    
+cif_compañia mf.compañia.cif%type;
+contador number(10,0);
+contador_total number(10,0);
+
+cursor num_tarifa(tar mf.tarifa.tarifa%type, cif mf.compañia.cif%type) is
+select tlf.numero, tlf.f_contrato,tlf.puntos,cl.nombre
+from mf.telefono tlf inner join mf.cliente cl on tlf.cliente = cl.dni
+where tlf.tarifa = tar and tlf.compañia = cif;
+
+
+BEGIN
+select cif into cif_compañia
+from mf.compañia
+where nombre = com;
+
+dbms_output.put_line('Tarifas de la compañia ' || com);
+contador_total := 0;
+
+for tarif in ta_compañia loop
+    contador := 0;
+    dbms_output.put_line('== ' || tarif.tarifa || ' == ' || tarif.descripcion || ' == ' || tarif.coste || ' ==');
+    dbms_output.put_line('--------------------------------------------------------------------');
+    dbms_output.put_line('- Telefono - F. contrato - Puntos - Nombre cliente -');
+    dbms_output.put_line('--------------------------------------------------------------------');
+    for nume in num_tarifa(tarif.tarifa, cif_compañia) loop
+    contador := contador + 1;
+    contador_total := contador_total + 1;
+    dbms_output.put_line(nume.numero || ' - ' || nume.f_contrato || ' - ' || nume.puntos || ' - ' || nume.nombre);
+    
+    end loop;
+      dbms_output.put_line('                              Nº Lineas: ' || contador);
+      end loop;
+        dbms_output.put_line('                              Nº Lineas totales: ' || contador_total);
+        
+    
+    exception
+    
+    when others  then
+      dbms_output.put_line('Ha ocurrido un error ');
+    end eje1;
+      
+    
+call eje1('Kietostar');
  
 
 
